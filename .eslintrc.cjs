@@ -15,8 +15,5 @@ module.exports = {
       'warn',
       { allowConstantExport: true },
     ],
-    semi: [2, 'never'],
-    quotes: [2, 'single', { avoidEscape: true }],
-    'comma-dangle': [2, 'always-multiline'],
   },
 }
