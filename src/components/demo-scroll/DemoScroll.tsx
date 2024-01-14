@@ -4,9 +4,15 @@ import InfiniteScroll from '../infinite-scroll/InfiniteScroll'
 import styles from './DemoScroll.module.css'
 
 const getDataFunc = async (page: number) => {
-  const response = await axios.get(
-    `https://pokeapi.co/api/v2/pokemon?limit=10&offset=${page * 10}`
-  )
+  const baseUrl = import.meta.env.VITE_POKEMON_API_URL
+
+  const response = await axios.get(`${baseUrl}` + 'pokemon', {
+    params: {
+      limit: 10,
+      offset: page * 10,
+    },
+  })
+
   const items: Pokemon[] = response.data.results
   //console.log(response.data)
   return items
