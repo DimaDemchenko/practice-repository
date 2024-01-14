@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { Pokemon } from '../../interfaces/response-data.interface'
+import { Pokemon } from '../../interfaces/pokemon-data.interface'
 import InfiniteScroll, {
   GetDataFuncType,
 } from '../infinite-scroll/InfiniteScroll'
