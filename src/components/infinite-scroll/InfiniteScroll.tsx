@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import React, { useEffect, useRef, useState } from 'react'
-
+import styles from './InfiniteScroll.module.css'
 export type GetDataFuncType<T> = (page: number) => Promise<T[]>
 
 type InfiniteScrollProps<T> = {
@@ -61,8 +61,8 @@ const InfiniteScroll = <T,>({
   }, [observerTarget, isLoading])
 
   return (
-    <div>
-      <ul>
+    <div className={styles.listContainer}>
+      <ul className={styles.list}>
         {items.map((item, index) => (
           <React.Fragment key={index}>{renderItem(item)}</React.Fragment>
         ))}
