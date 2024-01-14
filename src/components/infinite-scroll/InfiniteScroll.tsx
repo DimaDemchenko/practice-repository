@@ -2,32 +2,40 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 
-type GetDataFuncType<T> = (page: number) => Promise<T[]>
+export type GetDataFuncType<T> = (page: number) => Promise<T[]>
 
 type InfiniteScrollProps<T> = {
   getDataFunc: GetDataFuncType<T>
   renderItem: (item: T) => JSX.Element
+  maxOffset?: number
 }
 
 const InfiniteScroll = <T,>({
   getDataFunc,
   renderItem,
+  maxOffset,
 }: InfiniteScrollProps<T>) => {
   const [items, setItems] = useState<T[]>([])
-  const [page, setPage] = useState<number>(1)
+  const [page, setPage] = useState<number>(0)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const fetchData = async () => {
-    const data = await getDataFunc(page)
+    if (isLoading || (maxOffset !== undefined && page * 10 >= maxOffset)) return // page * 10 = offset
+    setIsLoading(true)
 
-    if (data) {
+    const data = await getDataFunc(page)
+    if (data && data.length > 0) {
       setPage((prevPage) => prevPage + 1)
       setItems((prevItems) => [...prevItems, ...data])
     }
+
+    setIsLoading(false)
   }
 
+  /*
   useEffect(() => {
     fetchData()
-  }, [])
+  }, [])*/
 
   const observerTarget = useRef(null)
 
@@ -50,7 +58,7 @@ const InfiniteScroll = <T,>({
         observer.unobserve(observerTarget.current)
       }
     }
-  }, [observerTarget])
+  }, [observerTarget, isLoading])
 
   return (
     <div>
@@ -59,6 +67,7 @@ const InfiniteScroll = <T,>({
           <React.Fragment key={index}>{renderItem(item)}</React.Fragment>
         ))}
       </ul>
+      {isLoading && <p>Loading...</p>}
       <div ref={observerTarget}></div>
     </div>
   )

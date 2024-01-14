@@ -23,3 +23,8 @@ export interface Data {
   last_historical_data: string
   platform: null | string
 }
+
+export interface Pokemon {
+  name: string
+  url: string
+}
