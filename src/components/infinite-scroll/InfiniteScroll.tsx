@@ -2,10 +2,11 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import styles from './InfiniteScroll.module.css'
-export type GetDataFuncType<T> = (page: number) => Promise<T[]>
+//export type GetDataFuncType<T> = (page: number) => Promise<T[]>
 
 type InfiniteScrollProps<T> = {
-  getDataFunc: GetDataFuncType<T>
+  //getDataFunc: GetDataFuncType<T>
+  getDataFunc: (page: number) => Promise<T[]>
   renderItem: (item: T) => JSX.Element
   maxOffset?: number
 }

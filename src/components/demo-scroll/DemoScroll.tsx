@@ -1,11 +1,9 @@
 import axios from 'axios'
 import { Pokemon } from '../../interfaces/pokemon-data.interface'
-import InfiniteScroll, {
-  GetDataFuncType,
-} from '../infinite-scroll/InfiniteScroll'
+import InfiniteScroll from '../infinite-scroll/InfiniteScroll'
 import styles from './DemoScroll.module.css'
 
-const getDataFunc: GetDataFuncType<Pokemon> = async (page: number) => {
+const getDataFunc = async (page: number) => {
   const response = await axios.get(
     `https://pokeapi.co/api/v2/pokemon?limit=10&offset=${page * 10}`
   )
