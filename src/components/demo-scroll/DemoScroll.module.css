@@ -1,4 +1,6 @@
 .listItem {
+  display: flex;
+  justify-content: space-between;
   background-color: #e6e6e6;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -19,7 +21,7 @@
 .spanUrl {
   color: #1a73e8;
   font-family: 'Courier New', Courier, monospace;
-  font-size: 14px;
+  font-size: 16px;
   margin-left: 30px;
 }
 
