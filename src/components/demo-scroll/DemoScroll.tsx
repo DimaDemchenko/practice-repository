@@ -1,32 +1,8 @@
-import axios from 'axios'
-import { Pokemon } from '../../interfaces/pokemon-data.interface'
-import InfiniteScroll from '../infinite-scroll/InfiniteScroll'
+import { Pokemon } from '../../types/pokemon-data'
+import { InfiniteScroll } from '../infinite-scroll/InfiniteScroll'
 import styles from './DemoScroll.module.css'
 
-const getDataFunc = async (
-  page: number,
-  offset: number
-): Promise<Pokemon[]> => {
-  try {
-    const baseUrl = import.meta.env.VITE_POKEMON_API_URL
-
-    const response = await axios.get(`${baseUrl}` + 'pokemon', {
-      params: {
-        limit: offset,
-        offset: page * offset,
-      },
-    })
-
-    const items: Pokemon[] = response.data.results
-    console.log(response.data)
-    return items
-  } catch (error) {
-    console.log(error)
-    return []
-  }
-}
-
-const renderItem: (item: Pokemon) => JSX.Element = (item) => {
+const renderItem = (item: Pokemon) => {
   return (
     <li className={styles.listItem} key={item.url}>
       <span className={styles.spanName}>Name: {item.name} </span>
@@ -35,17 +11,42 @@ const renderItem: (item: Pokemon) => JSX.Element = (item) => {
   )
 }
 
-const DemoScroll = () => {
+const getDataFunc = async (page: number, itemsPerPage: number) => {
+  try {
+    const baseUrl = import.meta.env.VITE_POKEMON_API_URL
+
+    const response = await fetch(
+      `${baseUrl}` +
+        'pokemon?' +
+        new URLSearchParams({
+          limit: itemsPerPage.toString(),
+          offset: (page * itemsPerPage).toString(),
+        })
+    )
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status}`)
+    }
+
+    const data = await response.json()
+    const items: Pokemon[] = data.results
+
+    return items
+  } catch (error) {
+    console.error('Fetch error:', error)
+    return []
+  }
+}
+
+export const DemoScroll = () => {
   return (
     <div className={styles.mainContainer}>
-      <InfiniteScroll
+      <InfiniteScroll<Pokemon>
         getDataFunc={getDataFunc}
         renderItem={renderItem}
-        maxOffset={230}
-        offset={5}
-      ></InfiniteScroll>
+        maxItemsInList={230}
+        itemsPerPage={5}
+      />
     </div>
   )
 }
-
-export default DemoScroll
