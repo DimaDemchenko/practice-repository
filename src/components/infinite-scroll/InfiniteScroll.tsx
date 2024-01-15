@@ -6,25 +6,30 @@ import styles from './InfiniteScroll.module.css'
 
 type InfiniteScrollProps<T> = {
   //getDataFunc: GetDataFuncType<T>
-  getDataFunc: (page: number) => Promise<T[]>
+  getDataFunc: (page: number, offset: number) => Promise<T[]>
   renderItem: (item: T) => JSX.Element
-  maxOffset?: number
+  maxOffset: number
+  offset: number
 }
 
 const InfiniteScroll = <T,>({
   getDataFunc,
   renderItem,
   maxOffset,
+  offset,
 }: InfiniteScrollProps<T>) => {
   const [items, setItems] = useState<T[]>([])
   const [page, setPage] = useState<number>(0)
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const fetchData = async () => {
-    if (isLoading || (maxOffset !== undefined && page * 10 >= maxOffset)) return // page * 10 = offset
+    if (isLoading || (maxOffset !== undefined && page * offset >= maxOffset))
+      return
+
     setIsLoading(true)
 
-    const data = await getDataFunc(page)
+    const data = await getDataFunc(page, offset)
+
     if (data && data.length > 0) {
       setPage((prevPage) => prevPage + 1)
       setItems((prevItems) => [...prevItems, ...data])
@@ -47,7 +52,7 @@ const InfiniteScroll = <T,>({
           fetchData()
         }
       },
-      { threshold: 1 }
+      { threshold: 0.1 }
     )
 
     if (observerTarget.current) {
@@ -59,7 +64,7 @@ const InfiniteScroll = <T,>({
         observer.unobserve(observerTarget.current)
       }
     }
-  }, [observerTarget, isLoading])
+  }, [isLoading])
 
   return (
     <div className={styles.listContainer}>
