@@ -21,6 +21,11 @@ export const InfiniteScroll = <T,>({
   const observerTarget = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    setItems([])
+    setPage(0)
+  }, [getDataFunc])
+
+  useEffect(() => {
     if (
       !observerTarget.current ||
       isLoading ||
@@ -31,14 +36,18 @@ export const InfiniteScroll = <T,>({
     const fetchData = async () => {
       setIsLoading(true)
 
-      const data = await getDataFunc(page, itemsPerPage)
+      try {
+        const data = await getDataFunc(page, itemsPerPage)
 
-      if (data && data.length > 0) {
-        setPage((prevPage) => prevPage + 1)
-        setItems((prevItems) => [...prevItems, ...data])
+        if (data && data.length > 0) {
+          setPage((prevPage) => prevPage + 1)
+          setItems((prevItems) => [...prevItems, ...data])
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      } finally {
+        setIsLoading(false)
       }
-
-      setIsLoading(false)
     }
 
     const target = observerTarget.current
