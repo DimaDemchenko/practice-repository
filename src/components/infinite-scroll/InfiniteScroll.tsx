@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { CameraStream } from '../camera-stream/CameraStream'
 import styles from './InfiniteScroll.module.css'
 
 type InfiniteScrollProps<T> = {
@@ -6,6 +7,7 @@ type InfiniteScrollProps<T> = {
   renderItem: (item: T) => JSX.Element
   maxItemsInList: number
   itemsPerPage: number
+  isScrollByCameraOn?: boolean
 }
 
 export const InfiniteScroll = <T,>({
@@ -13,6 +15,7 @@ export const InfiniteScroll = <T,>({
   renderItem,
   maxItemsInList,
   itemsPerPage,
+  isScrollByCameraOn,
 }: InfiniteScrollProps<T>) => {
   const [items, setItems] = useState<T[]>([])
   const [page, setPage] = useState(0)
@@ -69,14 +72,17 @@ export const InfiniteScroll = <T,>({
   }, [getDataFunc, isLoading, maxItemsInList, itemsPerPage, page])
 
   return (
-    <div className={styles.listContainer}>
-      <ul className={styles.list}>
-        {items.map((item, index) => (
-          <React.Fragment key={index}>{renderItem(item)}</React.Fragment>
-        ))}
-      </ul>
-      {isLoading && <p>Loading...</p>}
-      <div ref={observerTarget}></div>
-    </div>
+    <>
+      {isScrollByCameraOn && <CameraStream />}
+      <div className={styles.listContainer}>
+        <ul className={styles.list}>
+          {items.map((item, index) => (
+            <React.Fragment key={index}>{renderItem(item)}</React.Fragment>
+          ))}
+        </ul>
+        {isLoading && <p>Loading...</p>}
+        <div ref={observerTarget} />
+      </div>
+    </>
   )
 }

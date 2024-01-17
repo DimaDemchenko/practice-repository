@@ -44,8 +44,9 @@ export const DemoScroll = () => {
       <InfiniteScroll<Pokemon>
         getDataFunc={getDataFunc}
         renderItem={renderItem}
-        maxItemsInList={230}
+        maxItemsInList={500}
         itemsPerPage={5}
+        isScrollByCameraOn={true}
       />
     </div>
   )
