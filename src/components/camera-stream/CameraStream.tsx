@@ -3,31 +3,31 @@ import styles from './CameraStream.module.css'
 
 export const CameraStream = () => {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const [showCam, setShowCam] = useState(false)
-
-  const getVideo = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: 1280, height: 720 },
-      })
-
-      const video = videoRef.current
-
-      if (!video) return
-
-      video.srcObject = stream
-      video.play()
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  const [isVideoVisible, setIsVideoVisible] = useState(false)
 
   useEffect(() => {
-    getVideo()
+    const initializeCamera = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: 1280, height: 720 },
+        })
+
+        const video = videoRef.current
+
+        if (!video) return
+
+        video.srcObject = stream
+        video.play()
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    initializeCamera()
   }, [])
 
   const handleChange = () => {
-    setShowCam(!showCam)
+    setIsVideoVisible(!isVideoVisible)
   }
 
   return (
@@ -36,14 +36,14 @@ export const CameraStream = () => {
         <input
           type="checkbox"
           id="showVideo"
-          checked={showCam}
+          checked={isVideoVisible}
           onChange={handleChange}
-        ></input>
+        />
         <label htmlFor="showVideo">Show video</label>
       </div>
       <div>
         <video
-          className={showCam ? styles.videoStream : styles.displayNone}
+          className={isVideoVisible ? styles.videoStream : styles.displayNone}
           ref={videoRef}
         ></video>
       </div>
