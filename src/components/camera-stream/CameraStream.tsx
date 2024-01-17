@@ -45,7 +45,7 @@ export const CameraStream = () => {
         <video
           className={isVideoVisible ? styles.videoStream : styles.displayNone}
           ref={videoRef}
-        ></video>
+        />
       </div>
     </div>
   )

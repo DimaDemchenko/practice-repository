@@ -81,7 +81,7 @@ export const InfiniteScroll = <T,>({
           ))}
         </ul>
         {isLoading && <p>Loading...</p>}
-        <div ref={observerTarget}></div>
+        <div ref={observerTarget} />
       </div>
     </>
   )
