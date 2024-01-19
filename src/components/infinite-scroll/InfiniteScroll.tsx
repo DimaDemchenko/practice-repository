@@ -20,8 +20,14 @@ export const InfiniteScroll = <T,>({
   const [items, setItems] = useState<T[]>([])
   const [page, setPage] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
-
+  const listRef = useRef<HTMLDivElement>(null)
   const observerTarget = useRef<HTMLDivElement>(null)
+
+  const handleScrollDown = () => {
+    if (!listRef.current) return
+
+    listRef.current.scrollBy({ top: 700, left: 0, behavior: 'smooth' })
+  }
 
   useEffect(() => {
     setItems([])
@@ -73,15 +79,15 @@ export const InfiniteScroll = <T,>({
 
   return (
     <>
-      {isScrollByCameraOn && <CameraStream />}
-      <div className={styles.listContainer}>
+      {isScrollByCameraOn && <CameraStream handleScroll={handleScrollDown} />}
+      <div ref={listRef} className={styles.listContainer}>
         <ul className={styles.list}>
           {items.map((item, index) => (
             <React.Fragment key={index}>{renderItem(item)}</React.Fragment>
           ))}
+          <div ref={observerTarget} />
         </ul>
         {isLoading && <p>Loading...</p>}
-        <div ref={observerTarget} />
       </div>
     </>
   )

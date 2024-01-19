@@ -5,10 +5,12 @@
   padding: 20px;
   margin: auto;
   display: inline-block;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  max-height: 900px;
 }
 
 .list {
   list-style: none;
   padding: 0;
 }
-
