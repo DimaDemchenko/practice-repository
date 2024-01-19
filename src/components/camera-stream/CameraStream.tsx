@@ -96,7 +96,6 @@ export const CameraStream = ({ handleScroll }: CameraScrollProps) => {
   return (
     <div className={styles.cameraContainer}>
       <div className={styles.checkBoxStyle}>
-        <button onClick={handleScroll}>Scroll</button>
         <input
           type="checkbox"
           id="showVideo"
