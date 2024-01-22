@@ -5,43 +5,62 @@ import { useEffect, useRef, useState } from 'react'
 import styles from './CameraStream.module.css'
 
 type CameraScrollProps = {
-  handleScroll: () => void
+  handleWrist: (direction: 'up' | 'down') => void
 }
 
-export const CameraStream = ({ handleScroll }: CameraScrollProps) => {
+export const CameraStream = ({ handleWrist }: CameraScrollProps) => {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const prevRightWristPosRef = useRef<Vector2D>({ x: 0, y: 0 })
   const [isVideoVisible, setIsVideoVisible] = useState(false)
-  const [rightWristPos, setRightWristPos] = useState<Vector2D>({ x: 0, y: 0 })
+
+  const handleScrollRef = useRef(handleWrist)
+  handleScrollRef.current = handleWrist
 
   useEffect(() => {
-    let poseNetModel: posenet.PoseNet | null = null
+    let initialWristPosUp: { x: number; y: number } | undefined
 
-    const initializePoseNet = async () => {
-      poseNetModel = await posenet.load()
+    const handleWristMovementUp = (newWristPos: Vector2D) => {
+      console.log(newWristPos)
+      if (!initialWristPosUp || newWristPos.y - initialWristPosUp.y > 30) {
+        initialWristPosUp = newWristPos
+        return
+      }
+
+      if (initialWristPosUp.y - newWristPos.y > 300) {
+        handleScrollRef.current('up')
+        initialWristPosUp = newWristPos
+      }
     }
 
+    let initialWristPosDown: { x: number; y: number } | undefined
+
+    const handleWristMovementDown = (newWristPos: Vector2D) => {
+      if (!initialWristPosDown || initialWristPosDown.y - newWristPos.y > 30) {
+        initialWristPosDown = newWristPos
+        return
+      }
+
+      if (newWristPos.y - initialWristPosDown.y > 300) {
+        handleScrollRef.current('down')
+        initialWristPosDown = newWristPos
+      }
+    }
+
+    let poseNetModel: posenet.PoseNet | null = null
+
     const detectPose = async () => {
-      if (!poseNetModel || !videoRef.current || !canvasRef.current) return
-      const video = videoRef.current
-      const canvas = canvasRef.current
-      const context = canvas.getContext('2d')
+      if (!poseNetModel || !videoRef.current) return
 
-      canvas.width = video.videoWidth
-      canvas.height = video.videoHeight
+      const pose = await poseNetModel.estimateSinglePose(videoRef.current)
+      const wristPosition = pose.keypoints[10].position
 
-      context?.drawImage(video, 0, 0)
-
-      const pose = await poseNetModel.estimateSinglePose(canvas)
-
-      setRightWristPos(pose.keypoints[10].position)
+      handleWristMovementUp(wristPosition)
+      handleWristMovementDown(wristPosition)
     }
 
     const initializeCamera = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { width: 1280, height: 720 },
+          video: { width: 640, height: 480 },
         })
 
         const video = videoRef.current
@@ -53,7 +72,7 @@ export const CameraStream = ({ handleScroll }: CameraScrollProps) => {
           video.play()
         }
 
-        await initializePoseNet()
+        poseNetModel = await posenet.load()
       } catch (error) {
         console.log(error)
       }
@@ -63,31 +82,12 @@ export const CameraStream = ({ handleScroll }: CameraScrollProps) => {
     tf.ready()
     initializeCamera()
 
-    const intervalId = setInterval(() => {
-      detectPose()
-    }, 1000)
+    const intervalId = setInterval(detectPose, 200)
 
     return () => {
       clearInterval(intervalId)
     }
   }, [])
-
-  useEffect(() => {
-    if (
-      rightWristPos.x === prevRightWristPosRef.current.x &&
-      rightWristPos.y === prevRightWristPosRef.current.y
-    )
-      return
-
-    if (prevRightWristPosRef.current.y - rightWristPos.y > 300) {
-      handleScroll()
-      prevRightWristPosRef.current = { x: 0, y: 0 }
-
-      return
-    }
-
-    prevRightWristPosRef.current = rightWristPos
-  }, [rightWristPos, handleScroll])
 
   const handleChange = () => {
     setIsVideoVisible(!isVideoVisible)
@@ -108,8 +108,9 @@ export const CameraStream = ({ handleScroll }: CameraScrollProps) => {
         <video
           className={isVideoVisible ? styles.videoStream : styles.displayNone}
           ref={videoRef}
+          width={640}
+          height={480}
         />
-        <canvas ref={canvasRef} className={styles.displayNone} />
       </div>
     </div>
   )

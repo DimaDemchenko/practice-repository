@@ -23,10 +23,14 @@ export const InfiniteScroll = <T,>({
   const listRef = useRef<HTMLDivElement>(null)
   const observerTarget = useRef<HTMLDivElement>(null)
 
-  const handleScrollDown = () => {
+  const handleWrist = (direction: 'up' | 'down') => {
     if (!listRef.current) return
 
-    listRef.current.scrollBy({ top: 700, left: 0, behavior: 'smooth' })
+    listRef.current.scrollBy({
+      top: direction === 'up' ? 700 : -700,
+      left: 0,
+      behavior: 'smooth',
+    })
   }
 
   useEffect(() => {
@@ -79,7 +83,7 @@ export const InfiniteScroll = <T,>({
 
   return (
     <>
-      {isScrollByCameraOn && <CameraStream handleScroll={handleScrollDown} />}
+      {isScrollByCameraOn && <CameraStream handleWrist={handleWrist} />}
       <div ref={listRef} className={styles.listContainer}>
         <ul className={styles.list}>
           {items.map((item, index) => (
