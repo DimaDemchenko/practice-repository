@@ -2,7 +2,6 @@ import * as posenet from '@tensorflow-models/posenet'
 import { Vector2D } from '@tensorflow-models/posenet/dist/types'
 import * as tf from '@tensorflow/tfjs'
 import { useEffect, useRef, useState } from 'react'
-import styles from './CameraStream.module.css'
 
 type CameraScrollProps = {
   handleWrist: (direction: 'up' | 'down') => void
@@ -46,15 +45,21 @@ export const CameraStream = ({ handleWrist }: CameraScrollProps) => {
     }
 
     let poseNetModel: posenet.PoseNet | null = null
+    let isDetecting = false
 
     const detectPose = async () => {
-      if (!poseNetModel || !videoRef.current) return
+      if (!poseNetModel || !videoRef.current || isDetecting) return
+      try {
+        isDetecting = true
+        const pose = await poseNetModel.estimateSinglePose(videoRef.current)
+        const wristPosition = pose.keypoints[10].position
+        isDetecting = false
 
-      const pose = await poseNetModel.estimateSinglePose(videoRef.current)
-      const wristPosition = pose.keypoints[10].position
-
-      handleWristMovementUp(wristPosition)
-      handleWristMovementDown(wristPosition)
+        handleWristMovementUp(wristPosition)
+        handleWristMovementDown(wristPosition)
+      } finally {
+        isDetecting = false
+      }
     }
 
     const initializeCamera = async () => {
@@ -82,7 +87,9 @@ export const CameraStream = ({ handleWrist }: CameraScrollProps) => {
     tf.ready()
     initializeCamera()
 
-    const intervalId = setInterval(detectPose, 200)
+    const intervalId = setInterval(() => {
+      detectPose()
+    }, 100)
 
     return () => {
       clearInterval(intervalId)
@@ -94,8 +101,8 @@ export const CameraStream = ({ handleWrist }: CameraScrollProps) => {
   }
 
   return (
-    <div className={styles.cameraContainer}>
-      <div className={styles.checkBoxStyle}>
+    <div className="camera-container">
+      <div className="check-box">
         <input
           type="checkbox"
           id="showVideo"
@@ -106,7 +113,7 @@ export const CameraStream = ({ handleWrist }: CameraScrollProps) => {
       </div>
       <div>
         <video
-          className={isVideoVisible ? styles.videoStream : styles.displayNone}
+          className={isVideoVisible ? 'video-stream' : 'display-none'}
           ref={videoRef}
           width={640}
           height={480}

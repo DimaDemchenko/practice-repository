@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { CameraStream } from '../camera-stream/CameraStream'
-import styles from './InfiniteScroll.module.css'
 
 type InfiniteScrollProps<T> = {
   getDataFunc: (page: number, offset: number) => Promise<T[]>
@@ -84,8 +83,8 @@ export const InfiniteScroll = <T,>({
   return (
     <>
       {isScrollByCameraOn && <CameraStream handleWrist={handleWrist} />}
-      <div ref={listRef} className={styles.listContainer}>
-        <ul className={styles.list}>
+      <div ref={listRef} className="list-container">
+        <ul className="list">
           {items.map((item, index) => (
             <React.Fragment key={index}>{renderItem(item)}</React.Fragment>
           ))}

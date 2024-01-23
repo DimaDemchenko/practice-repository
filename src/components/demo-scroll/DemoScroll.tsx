@@ -1,12 +1,12 @@
 import { Pokemon } from '../../types/pokemon-data'
 import { InfiniteScroll } from '../infinite-scroll/InfiniteScroll'
-import styles from './DemoScroll.module.css'
+import './DemoScroll.css'
 
 const renderItem = (item: Pokemon) => {
   return (
-    <li className={styles.listItem} key={item.url}>
-      <span className={styles.spanName}>Name: {item.name} </span>
-      <span className={styles.spanUrl}>Url: {item.url}</span>
+    <li className="list-item" key={item.url}>
+      <span className="span-name">Name: {item.name} </span>
+      <span className="span-url">Url: {item.url}</span>
     </li>
   )
 }
@@ -40,7 +40,7 @@ const getDataFunc = async (page: number, itemsPerPage: number) => {
 
 export const DemoScroll = () => {
   return (
-    <div className={styles.mainContainer}>
+    <div className="main-container">
       <InfiniteScroll<Pokemon>
         getDataFunc={getDataFunc}
         renderItem={renderItem}
