@@ -44,7 +44,7 @@ export const DemoScroll = () => {
 
   const handleChange = () => {
     setIsVideoVisible(!isVideoVisible)
-    const videoPreview = document.getElementById('videopPreview')
+    const videoPreview = document.getElementById('videoPreview')
 
     if (!videoPreview) return
 
