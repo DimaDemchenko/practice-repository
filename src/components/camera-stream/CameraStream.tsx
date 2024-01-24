@@ -11,7 +11,7 @@ export const CameraStream = ({ handleWrist }: CameraScrollProps) => {
     <div className="camera-container">
       <div>
         <video
-          className="video-stream"
+          className="display-none"
           ref={videoRef}
           width={1280}
           height={720}

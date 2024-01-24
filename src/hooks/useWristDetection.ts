@@ -1,6 +1,7 @@
 import * as posenet from '@tensorflow-models/posenet'
 import * as tf from '@tensorflow/tfjs'
 import { useEffect, useRef } from 'react'
+
 type useWristProps = {
   handleWrist: (direction: 'up' | 'down') => void
 }
@@ -30,7 +31,7 @@ export const useWristDetection = ({ handleWrist }: useWristProps) => {
           return
         }
 
-        if (wristPosition.y < 300 && Date.now() - initialWristPos.time > 250) {
+        if (wristPosition.y < 220 && Date.now() - initialWristPos.time > 250) {
           handleScrollRef.current('down')
           initialWristPos = { ...wristPosition, time: Date.now() }
         }
