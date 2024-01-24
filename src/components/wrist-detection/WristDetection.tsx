@@ -2,11 +2,19 @@ import * as posenet from '@tensorflow-models/posenet'
 import * as tf from '@tensorflow/tfjs'
 import { useEffect, useRef } from 'react'
 
-type useWristProps = {
+type WristDetectionProps = {
   handleWrist: (direction: 'up' | 'down') => void
+  isCameraPreviewOn?: boolean
+  videoWidth?: number
+  videoHeight?: number
 }
 
-export const useWristDetection = ({ handleWrist }: useWristProps) => {
+export const WristDetection = ({
+  handleWrist,
+  isCameraPreviewOn,
+  videoWidth,
+  videoHeight,
+}: WristDetectionProps) => {
   const videoRef = useRef<HTMLVideoElement>(null)
   const handleScrollRef = useRef(handleWrist)
   handleScrollRef.current = handleWrist
@@ -17,7 +25,13 @@ export const useWristDetection = ({ handleWrist }: useWristProps) => {
     let isDetecting = false
 
     const detectPose = async () => {
-      if (!poseNetModel || !videoRef.current || isDetecting) {
+      if (
+        !poseNetModel ||
+        !videoRef.current ||
+        isDetecting ||
+        !videoWidth ||
+        !videoHeight
+      ) {
         return
       }
       try {
@@ -31,12 +45,18 @@ export const useWristDetection = ({ handleWrist }: useWristProps) => {
           return
         }
 
-        if (wristPosition.y < 220 && Date.now() - initialWristPos.time > 250) {
+        if (
+          wristPosition.y < videoHeight * 0.33 &&
+          Date.now() - initialWristPos.time > 250
+        ) {
           handleScrollRef.current('down')
           initialWristPos = { ...wristPosition, time: Date.now() }
         }
 
-        if (wristPosition.y > 500 && Date.now() - initialWristPos.time > 250) {
+        if (
+          wristPosition.y > videoHeight * 0.66 &&
+          Date.now() - initialWristPos.time > 250
+        ) {
           handleScrollRef.current('up')
           initialWristPos = { ...wristPosition, time: Date.now() }
         }
@@ -48,7 +68,7 @@ export const useWristDetection = ({ handleWrist }: useWristProps) => {
     const initializeCamera = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { width: 1280, height: 720 },
+          video: { width: videoWidth, height: videoHeight },
         })
 
         const video = videoRef.current
@@ -77,7 +97,17 @@ export const useWristDetection = ({ handleWrist }: useWristProps) => {
     return () => {
       clearInterval(intervalId)
     }
-  }, [])
+  }, [videoHeight, videoWidth])
 
-  return videoRef
+  return (
+    <>
+      <video
+        id="videoPreview"
+        className={isCameraPreviewOn ? 'video-stream' : 'display-none'}
+        ref={videoRef}
+        width={videoWidth}
+        height={videoHeight}
+      />
+    </>
+  )
 }

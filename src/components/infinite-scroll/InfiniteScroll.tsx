@@ -7,6 +7,9 @@ type InfiniteScrollProps<T> = {
   maxItemsInList: number
   itemsPerPage: number
   isScrollByCameraOn?: boolean
+  videoWidth?: number
+  videoHeight?: number
+  isCameraPreviewOn?: boolean
 }
 
 export const InfiniteScroll = <T,>({
@@ -15,6 +18,9 @@ export const InfiniteScroll = <T,>({
   maxItemsInList,
   itemsPerPage,
   isScrollByCameraOn,
+  videoWidth = 1280,
+  videoHeight = 720,
+  isCameraPreviewOn,
 }: InfiniteScrollProps<T>) => {
   const [items, setItems] = useState<T[]>([])
   const [page, setPage] = useState(0)
@@ -82,7 +88,14 @@ export const InfiniteScroll = <T,>({
 
   return (
     <>
-      {isScrollByCameraOn && <CameraStream handleWrist={handleWrist} />}
+      {isScrollByCameraOn && (
+        <CameraStream
+          handleWrist={handleWrist}
+          isCameraPreviewOn={isCameraPreviewOn}
+          videoWidth={videoWidth}
+          videoHeight={videoHeight}
+        />
+      )}
       <div ref={listRef} className="list-container">
         <ul className="list">
           {items.map((item, index) => (

@@ -41,20 +41,14 @@ const getDataFunc = async (page: number, itemsPerPage: number) => {
 
 export const DemoScroll = () => {
   const [isVideoVisible, setIsVideoVisible] = useState(false)
+  const [isScrollByCameraOn, setIsScrollByCameraOn] = useState(false)
 
-  const handleChange = () => {
+  const handleScrollByCamera = () => {
+    setIsScrollByCameraOn(!isScrollByCameraOn)
+  }
+
+  const handleVideoVisible = () => {
     setIsVideoVisible(!isVideoVisible)
-    const videoPreview = document.getElementById('videoPreview')
-
-    if (!videoPreview) return
-
-    if (isVideoVisible) {
-      videoPreview.classList.remove('video-stream')
-      videoPreview.classList.add('display-none')
-    } else {
-      videoPreview.classList.remove('display-none')
-      videoPreview.classList.add('video-stream')
-    }
   }
 
   return (
@@ -62,9 +56,18 @@ export const DemoScroll = () => {
       <div className="check-box">
         <input
           type="checkbox"
+          id="scrollByCamera"
+          checked={isScrollByCameraOn}
+          onChange={handleScrollByCamera}
+        />
+        <label htmlFor="scrollByCamera">Scroll by camera</label>
+      </div>
+      <div className="check-box">
+        <input
+          type="checkbox"
           id="showVideo"
           checked={isVideoVisible}
-          onChange={handleChange}
+          onChange={handleVideoVisible}
         />
         <label htmlFor="showVideo">Show video</label>
       </div>
@@ -73,7 +76,7 @@ export const DemoScroll = () => {
         renderItem={renderItem}
         maxItemsInList={500}
         itemsPerPage={5}
-        isScrollByCameraOn={true}
+        isScrollByCameraOn={isScrollByCameraOn}
       />
     </div>
   )

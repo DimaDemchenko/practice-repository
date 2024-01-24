@@ -1,23 +1,26 @@
-import { useWristDetection } from '../../hooks/useWristDetection'
+import { WristDetection } from '../wrist-detection/WristDetection'
 
-type CameraScrollProps = {
+type CameraStreamProps = {
   handleWrist: (direction: 'up' | 'down') => void
+  isCameraPreviewOn?: boolean
+  videoWidth?: number
+  videoHeight?: number
 }
 
-export const CameraStream = ({ handleWrist }: CameraScrollProps) => {
-  const videoRef = useWristDetection({ handleWrist })
-
+export const CameraStream = ({
+  handleWrist,
+  isCameraPreviewOn,
+  videoWidth,
+  videoHeight,
+}: CameraStreamProps) => {
   return (
     <div className="camera-container">
-      <div>
-        <video
-          id="videoPreview"
-          className="display-none"
-          ref={videoRef}
-          width={1280}
-          height={720}
-        />
-      </div>
+      <WristDetection
+        handleWrist={handleWrist}
+        isCameraPreviewOn={isCameraPreviewOn}
+        videoWidth={videoWidth}
+        videoHeight={videoHeight}
+      />
     </div>
   )
 }
