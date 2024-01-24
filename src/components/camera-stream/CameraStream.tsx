@@ -1,7 +1,6 @@
 import * as posenet from '@tensorflow-models/posenet'
-import { Vector2D } from '@tensorflow-models/posenet/dist/types'
 import * as tf from '@tensorflow/tfjs'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 
 type CameraScrollProps = {
   handleWrist: (direction: 'up' | 'down') => void
@@ -9,54 +8,38 @@ type CameraScrollProps = {
 
 export const CameraStream = ({ handleWrist }: CameraScrollProps) => {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const [isVideoVisible, setIsVideoVisible] = useState(false)
 
   const handleScrollRef = useRef(handleWrist)
   handleScrollRef.current = handleWrist
 
   useEffect(() => {
-    let initialWristPosUp: { x: number; y: number } | undefined
-
-    const handleWristMovementUp = (newWristPos: Vector2D) => {
-      console.log(newWristPos)
-      if (!initialWristPosUp || newWristPos.y - initialWristPosUp.y > 30) {
-        initialWristPosUp = newWristPos
-        return
-      }
-
-      if (initialWristPosUp.y - newWristPos.y > 300) {
-        handleScrollRef.current('up')
-        initialWristPosUp = newWristPos
-      }
-    }
-
-    let initialWristPosDown: { x: number; y: number } | undefined
-
-    const handleWristMovementDown = (newWristPos: Vector2D) => {
-      if (!initialWristPosDown || initialWristPosDown.y - newWristPos.y > 30) {
-        initialWristPosDown = newWristPos
-        return
-      }
-
-      if (newWristPos.y - initialWristPosDown.y > 300) {
-        handleScrollRef.current('down')
-        initialWristPosDown = newWristPos
-      }
-    }
-
+    let initialWristPos: { x: number; y: number; time: number } | undefined
     let poseNetModel: posenet.PoseNet | null = null
     let isDetecting = false
 
     const detectPose = async () => {
-      if (!poseNetModel || !videoRef.current || isDetecting) return
+      if (!poseNetModel || !videoRef.current || isDetecting) {
+        return
+      }
       try {
         isDetecting = true
         const pose = await poseNetModel.estimateSinglePose(videoRef.current)
         const wristPosition = pose.keypoints[10].position
-        isDetecting = false
+        console.log(wristPosition)
+        if (!initialWristPos) {
+          initialWristPos = { ...wristPosition, time: Date.now() }
+          return
+        }
 
-        handleWristMovementUp(wristPosition)
-        handleWristMovementDown(wristPosition)
+        if (wristPosition.y < 300 && Date.now() - initialWristPos.time > 250) {
+          handleScrollRef.current('down')
+          initialWristPos = { ...wristPosition, time: Date.now() }
+        }
+
+        if (wristPosition.y > 500 && Date.now() - initialWristPos.time > 250) {
+          handleScrollRef.current('up')
+          initialWristPos = { ...wristPosition, time: Date.now() }
+        }
       } finally {
         isDetecting = false
       }
@@ -65,7 +48,7 @@ export const CameraStream = ({ handleWrist }: CameraScrollProps) => {
     const initializeCamera = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { width: 640, height: 480 },
+          video: { width: 1280, height: 720 },
         })
 
         const video = videoRef.current
@@ -96,27 +79,14 @@ export const CameraStream = ({ handleWrist }: CameraScrollProps) => {
     }
   }, [])
 
-  const handleChange = () => {
-    setIsVideoVisible(!isVideoVisible)
-  }
-
   return (
     <div className="camera-container">
-      <div className="check-box">
-        <input
-          type="checkbox"
-          id="showVideo"
-          checked={isVideoVisible}
-          onChange={handleChange}
-        />
-        <label htmlFor="showVideo">Show video</label>
-      </div>
       <div>
         <video
-          className={isVideoVisible ? 'video-stream' : 'display-none'}
+          className="display-none"
           ref={videoRef}
-          width={640}
-          height={480}
+          width={1280}
+          height={720}
         />
       </div>
     </div>
