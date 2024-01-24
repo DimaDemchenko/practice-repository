@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Pokemon } from '../../types/pokemon-data'
 import { InfiniteScroll } from '../infinite-scroll/InfiniteScroll'
 import './DemoScroll.css'
@@ -39,8 +40,34 @@ const getDataFunc = async (page: number, itemsPerPage: number) => {
 }
 
 export const DemoScroll = () => {
+  const [isVideoVisible, setIsVideoVisible] = useState(false)
+
+  const handleChange = () => {
+    setIsVideoVisible(!isVideoVisible)
+    const videoPreview = document.getElementById('videopPreview')
+
+    if (!videoPreview) return
+
+    if (isVideoVisible) {
+      videoPreview.classList.remove('video-stream')
+      videoPreview.classList.add('display-none')
+    } else {
+      videoPreview.classList.remove('display-none')
+      videoPreview.classList.add('video-stream')
+    }
+  }
+
   return (
     <div className="main-container">
+      <div className="check-box">
+        <input
+          type="checkbox"
+          id="showVideo"
+          checked={isVideoVisible}
+          onChange={handleChange}
+        />
+        <label htmlFor="showVideo">Show video</label>
+      </div>
       <InfiniteScroll<Pokemon>
         getDataFunc={getDataFunc}
         renderItem={renderItem}
