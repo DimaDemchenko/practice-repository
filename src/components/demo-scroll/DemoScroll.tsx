@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Pokemon } from '../../types/pokemon-data'
 import { InfiniteScroll } from '../infinite-scroll/InfiniteScroll'
 import './DemoScroll.css'
@@ -40,23 +39,8 @@ const getDataFunc = async (page: number, itemsPerPage: number) => {
 }
 
 export const DemoScroll = () => {
-  const [isVideoVisible, setIsVideoVisible] = useState(false)
-
-  const handleChange = () => {
-    setIsVideoVisible(!isVideoVisible)
-  }
-
   return (
     <div className="main-container">
-      <div className="check-box">
-        <input
-          type="checkbox"
-          id="showVideo"
-          checked={isVideoVisible}
-          onChange={handleChange}
-        />
-        <label htmlFor="showVideo">Show video</label>
-      </div>
       <InfiniteScroll<Pokemon>
         getDataFunc={getDataFunc}
         renderItem={renderItem}
