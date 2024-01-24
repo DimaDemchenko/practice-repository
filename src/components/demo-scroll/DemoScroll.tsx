@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Pokemon } from '../../types/pokemon-data'
 import { InfiniteScroll } from '../infinite-scroll/InfiniteScroll'
+import { InputCheckBox } from '../input-check-box/InputCheckBox'
 import './DemoScroll.css'
 
 const renderItem = (item: Pokemon) => {
@@ -53,30 +54,25 @@ export const DemoScroll = () => {
 
   return (
     <div className="main-container">
-      <div className="check-box">
-        <input
-          type="checkbox"
-          id="scrollByCamera"
-          checked={isScrollByCameraOn}
-          onChange={handleScrollByCamera}
-        />
-        <label htmlFor="scrollByCamera">Scroll by camera</label>
-      </div>
-      <div className="check-box">
-        <input
-          type="checkbox"
-          id="showVideo"
-          checked={isVideoVisible}
+      <InputCheckBox
+        isChecked={isScrollByCameraOn}
+        onChange={handleScrollByCamera}
+        labelText={'Scroll by camera'}
+      />
+      {isScrollByCameraOn && (
+        <InputCheckBox
+          isChecked={isVideoVisible}
           onChange={handleVideoVisible}
+          labelText={'Show video'}
         />
-        <label htmlFor="showVideo">Show video</label>
-      </div>
+      )}
       <InfiniteScroll<Pokemon>
         getDataFunc={getDataFunc}
         renderItem={renderItem}
         maxItemsInList={500}
         itemsPerPage={5}
         isScrollByCameraOn={isScrollByCameraOn}
+        isCameraPreviewOn={isVideoVisible}
       />
     </div>
   )
