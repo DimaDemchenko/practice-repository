@@ -23,6 +23,7 @@ export const WristDetection = ({
     let initialWristPos: { x: number; y: number; time: number } | undefined
     let poseNetModel: posenet.PoseNet | null = null
     let isDetecting = false
+    let stream: MediaStream | null = null
 
     const detectPose = async () => {
       if (
@@ -67,7 +68,7 @@ export const WristDetection = ({
 
     const initializeCamera = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
+        stream = await navigator.mediaDevices.getUserMedia({
           video: { width: videoWidth, height: videoHeight },
         })
 
@@ -96,13 +97,18 @@ export const WristDetection = ({
 
     return () => {
       clearInterval(intervalId)
+
+      if (!stream) return
+
+      stream.getTracks().forEach((track) => {
+        track.stop()
+      })
     }
   }, [videoHeight, videoWidth])
 
   return (
     <>
       <video
-        id="videoPreview"
         className={isCameraPreviewOn ? 'video-stream' : 'display-none'}
         ref={videoRef}
         width={videoWidth}
