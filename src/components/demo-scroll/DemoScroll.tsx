@@ -1,12 +1,14 @@
+import { useState } from 'react'
 import { Pokemon } from '../../types/pokemon-data'
 import { InfiniteScroll } from '../infinite-scroll/InfiniteScroll'
-import styles from './DemoScroll.module.css'
+import { InputCheckBox } from '../input-check-box/InputCheckBox'
+import './DemoScroll.css'
 
 const renderItem = (item: Pokemon) => {
   return (
-    <li className={styles.listItem} key={item.url}>
-      <span className={styles.spanName}>Name: {item.name} </span>
-      <span className={styles.spanUrl}>Url: {item.url}</span>
+    <li className="list-item" key={item.url}>
+      <span className="span-name">Name: {item.name} </span>
+      <span className="span-url">Url: {item.url}</span>
     </li>
   )
 }
@@ -39,14 +41,38 @@ const getDataFunc = async (page: number, itemsPerPage: number) => {
 }
 
 export const DemoScroll = () => {
+  const [isVideoVisible, setIsVideoVisible] = useState(false)
+  const [isScrollByCameraOn, setIsScrollByCameraOn] = useState(false)
+
+  const handleScrollByCamera = () => {
+    setIsScrollByCameraOn(!isScrollByCameraOn)
+  }
+
+  const handleVideoVisible = () => {
+    setIsVideoVisible(!isVideoVisible)
+  }
+
   return (
-    <div className={styles.mainContainer}>
+    <div className="main-container">
+      <InputCheckBox
+        isChecked={isScrollByCameraOn}
+        onChange={handleScrollByCamera}
+        labelText={'Scroll by camera'}
+      />
+      {isScrollByCameraOn && (
+        <InputCheckBox
+          isChecked={isVideoVisible}
+          onChange={handleVideoVisible}
+          labelText={'Show video'}
+        />
+      )}
       <InfiniteScroll<Pokemon>
         getDataFunc={getDataFunc}
         renderItem={renderItem}
         maxItemsInList={500}
         itemsPerPage={5}
-        isScrollByCameraOn={true}
+        isScrollByCameraOn={isScrollByCameraOn}
+        isCameraPreviewOn={isVideoVisible}
       />
     </div>
   )
