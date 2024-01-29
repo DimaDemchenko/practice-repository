@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Pokemon } from '../../types/pokemon-data'
 import { InfiniteScroll } from '../infinite-scroll/InfiniteScroll'
 import { InputCheckBox } from '../input-check-box/InputCheckBox'
@@ -43,6 +43,7 @@ const getDataFunc = async (page: number, itemsPerPage: number) => {
 export const DemoScroll = () => {
   const [isVideoVisible, setIsVideoVisible] = useState(false)
   const [isScrollByCameraOn, setIsScrollByCameraOn] = useState(false)
+  const mainContainerRef = useRef<HTMLDivElement>(null)
 
   const handleScrollByCamera = () => {
     setIsScrollByCameraOn(!isScrollByCameraOn)
@@ -52,11 +53,20 @@ export const DemoScroll = () => {
     setIsVideoVisible(!isVideoVisible)
   }
 
+  const changeHeightOfContainer = () => {
+    if (!mainContainerRef.current) return
+
+    mainContainerRef.current.classList.toggle('max-height')
+  }
+
   return (
-    <div className="main-container">
+    <div ref={mainContainerRef} className="main-container max-height">
       <InputCheckBox
         isChecked={isScrollByCameraOn}
-        onChange={handleScrollByCamera}
+        onChange={() => {
+          handleScrollByCamera()
+          changeHeightOfContainer()
+        }}
         labelText={'Scroll by camera'}
       />
       {isScrollByCameraOn && (
@@ -70,7 +80,7 @@ export const DemoScroll = () => {
         getDataFunc={getDataFunc}
         renderItem={renderItem}
         maxItemsInList={500}
-        itemsPerPage={5}
+        itemsPerPage={10}
         isScrollByCameraOn={isScrollByCameraOn}
         isCameraPreviewOn={isVideoVisible}
       />
